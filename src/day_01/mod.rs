@@ -1,9 +1,5 @@
-use std::{
-    fs::File,
-    io::{prelude::*, BufReader},
-    path::Path,
-    time::Instant,
-};
+use crate::utils::lines_from_file;
+use std::time::Instant;
 
 pub fn main() {
     let start = Instant::now();
@@ -43,12 +39,4 @@ fn part_2(entries: Vec<i32>) -> i32 {
         }
     }
     return 0;
-}
-
-fn lines_from_file(filename: impl AsRef<Path>) -> Vec<String> {
-    let file = File::open(filename).expect("no such file");
-    let buf = BufReader::new(file);
-    buf.lines()
-        .map(|l| l.expect("Could not parse line"))
-        .collect()
 }
