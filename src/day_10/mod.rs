@@ -1,19 +1,24 @@
 use crate::utils::lines_from_file;
-use std::{cmp::max, time::Instant};
+use std::time::Instant;
 
 pub fn main() {
     let start = Instant::now();
 
-    assert_eq!(part_1_test_1(), 35);
-    assert_eq!(part_1_test_2(), 220);
+    // assert_eq!(part_1_test_1(), 35);
+    // assert_eq!(part_1_test_2(), 220);
     // println!("part_1 {:?}", part_1());
 
     assert_eq!(part_2_test_1(), 8);
     assert_eq!(part_2_test_2(), 19208);
-    // TODO: PART 2 NOT FINISHED
+    println!("part_2 {:?}", part_2());
 
     let duration = start.elapsed();
     println!("Finished after {:?}", duration);
+}
+
+fn part_2() -> u64 {
+    let entries = lines_from_file("src/day_10/input.txt");
+    find_arrangement_count(&entries)
 }
 
 fn part_2_test_2() -> u64 {
@@ -46,39 +51,32 @@ fn find_arrangement_count(entries: &Vec<String>) -> u64 {
     numbers.push(0); // For the charging outlet
     numbers.sort();
 
-    println!("numbers {:#?}", numbers);
-
     let mut arrangement_count: u64 = 1;
     let mut i: usize = 0;
     loop {
-        println!("i {:?}", numbers[i]);
         let mut j: usize = i + 1;
-        let mut possibilities: u64 = 0;
+        let mut options: u32 = 0;
         loop {
-            if j < numbers.len() {
-                println!("j {:?}", numbers[j]);
-            }
             if j >= numbers.len() {
                 break;
             }
-            if numbers[j] - numbers[i + 1] == 2 {
-                possibilities += 1;
-            }
-            if numbers[j] - numbers[i] == 3 {
-                possibilities += 1;
+            if j - i == 1 && numbers[j] - numbers[i] == 3 {
                 break;
             }
-            if numbers[j] - numbers[i] > 3 {
+            options += 1;
+            if j + 1 >= numbers.len() || numbers[j + 1] - numbers[j] == 3 {
                 break;
             }
-            possibilities += 1;
-
             j += 1;
         }
-        println!("possibilities {:?}", possibilities);
-
-        arrangement_count *= max(1, possibilities);
-        println!("arrangement_count {:?}", arrangement_count);
+        if options > 0 {
+            let mut possibilities = 2u64.pow(options - 1);
+            // When there are more than 3 options, the first and last numbers can't be connected because their difference must me > 3, so there is one less possibility
+            if options > 3 {
+                possibilities -= 1;
+            }
+            arrangement_count *= possibilities;
+        }
         i = j;
         if i >= numbers.len() {
             break;
@@ -107,32 +105,4 @@ fn find_jolt_diff_product(entries: &Vec<String>) -> u16 {
     }
 
     one_diff_count * three_diff_count
-}
-
-fn find_diff_counts(entries: &Vec<String>) {
-    let mut numbers: Vec<u16> = entries.iter().map(|entry| entry.parse().unwrap()).collect();
-    numbers.push(0); // For the charging outlet
-    numbers.sort();
-
-    println!("numbers {:#?}", numbers);
-
-    let mut one_diff_count: u16 = 0;
-    let mut two_diff_count: u16 = 0;
-    let mut three_diff_count: u16 = 1; // Starts at 1 for the built-in adapter
-
-    let mut i: usize = 1;
-    while i < numbers.len() {
-        if numbers[i] - numbers[i - 1] == 3 {
-            three_diff_count += 1;
-        } else if numbers[i] - numbers[i - 1] == 2 {
-            two_diff_count += 1;
-        } else {
-            one_diff_count += 1;
-        }
-        i += 1;
-    }
-
-    println!("one_diff_count {:#?}", one_diff_count);
-    println!("two_diff_count {:#?}", two_diff_count);
-    println!("three_diff_count {:#?}", three_diff_count);
 }
