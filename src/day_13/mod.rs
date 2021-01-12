@@ -4,11 +4,24 @@ use std::time::Instant;
 pub fn main() {
     let start = Instant::now();
 
-    assert_eq!(part_1_test(), 295);
-    println!("part_1 {:?}", part_1());
+    // assert_eq!(part_1_test(), 295);
+    // println!("part_1 {:?}", part_1());
+
+    assert_eq!(part_2_test(), 1068781);
+    println!("part_2 {:?}", part_2());
 
     let duration = start.elapsed();
     println!("Finished after {:?}", duration);
+}
+
+fn part_2() -> u64 {
+    let entries = lines_from_file("src/day_13/input.txt");
+    compute_res_part_2(&entries, 100000000000000)
+}
+
+fn part_2_test() -> u64 {
+    let entries = lines_from_file("src/day_13/input-test.txt");
+    compute_res_part_2(&entries, 939)
 }
 
 fn part_1() -> u32 {
@@ -19,6 +32,23 @@ fn part_1() -> u32 {
 fn part_1_test() -> u32 {
     let entries = lines_from_file("src/day_13/input-test.txt");
     compute_res(&entries)
+}
+
+fn compute_res_part_2(entries: &Vec<String>, starting_time: u64) -> u64 {
+    let bus_id_list: Vec<&str> = entries[1].split(",").collect();
+
+    let mut time: u64 = starting_time;
+    'outer: loop {
+        for (i, bus_id) in bus_id_list.iter().enumerate() {
+            if bus_id != &"x" && (time + i as u64) % bus_id.parse::<u64>().unwrap() != 0 {
+                time += 1;
+                continue 'outer;
+            }
+        }
+        break;
+    }
+
+    time
 }
 
 fn compute_res(entries: &Vec<String>) -> u32 {
